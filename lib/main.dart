@@ -1,12 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:thesis_app/page/account.dart';
-import 'package:thesis_app/page/discover.dart';
 import 'package:thesis_app/page/home.dart';
 import 'package:thesis_app/page/login_selection.dart';
-import 'package:thesis_app/page/login.dart';
-import 'package:thesis_app/page/register.dart';
 
 //void main() => runApp(MyApp());
 

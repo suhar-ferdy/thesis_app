@@ -3,7 +3,6 @@ import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:mapbox_search_flutter/mapbox_search_flutter.dart';
 import 'package:thesis_app/firebase/crud.dart';
-import 'package:thesis_app/page/search.dart';
 
 
 class PostEventPage extends StatefulWidget {

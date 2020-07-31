@@ -2,40 +2,72 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:thesis_app/page/home.dart';
 import 'package:thesis_app/page/login.dart';
+import 'package:thesis_app/widget/toast_msg.dart';
 
 class RegisterPage extends StatefulWidget {
+  RegisterPage({Key key}) : super (key : key);
   @override
   _RegisterPageState createState() => _RegisterPageState();
 }
 
+TextEditingController emailController = new TextEditingController();
+TextEditingController passController = new TextEditingController();
+TextEditingController confirmPassController = new TextEditingController();
+bool validEmail = false;
+bool validPass = false;
+bool isLoading = false;
+FlutterToast flutterToast;
+final FirebaseAuth _auth = FirebaseAuth.instance;
 
 class _RegisterPageState extends State<RegisterPage> {
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    flutterToast = FlutterToast(context);
+  }
+  @override
   Widget build(BuildContext context) {
 
-    final GlobalKey<FormState> _formKeyRegister = GlobalKey<FormState>();
-    TextEditingController emailController = new TextEditingController();
-    TextEditingController passController = new TextEditingController();
-    TextEditingController confirmPassController = new TextEditingController();
-    bool validEmail = false;
-    bool passMatch = false;
-    final FirebaseAuth _auth = FirebaseAuth.instance;
+    final GlobalKey<FormState> formKeyRegister = GlobalKey<FormState>();
 
     void loginValidate() async{
-      final FormState form = _formKeyRegister.currentState;
-      if(_formKeyRegister.currentState.validate()){
-        form.save();
-        if(passMatch == true && validEmail == true){
-          _auth.createUserWithEmailAndPassword(
-            email: emailController.text,
-            password: passController.text,
-          ).whenComplete((){
+      setState(() {
+        isLoading = true;
+      });
+      if (formKeyRegister.currentState.validate()) {
+        if(validEmail == true && validPass == true){
+          final user = await _auth
+              .createUserWithEmailAndPassword(email: emailController.text, password: passController.text,)
+              .catchError((e){
+            setState(() {
+              isLoading = false;
+            });
+            ToastMsg(msg: e.code.toString(), flutterToast: flutterToast).showToast();
+          }).whenComplete((){
+            setState(() {
+              isLoading = false;
+            });
           });
-          Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => HomePage()));
+          if(user!= null){
+            final login = await _auth.signInWithEmailAndPassword(email: emailController.text, password: passController.text);
+            if(login != null){
+              emailController.clear();
+              passController.clear();
+              confirmPassController.clear();
+              Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => HomePage()));
+            }
+          }
 
         }
+      }
+      else{
+        setState(() {
+          isLoading = false;
+        });
       }
     }
 
@@ -59,27 +91,38 @@ class _RegisterPageState extends State<RegisterPage> {
       String msg = "";
       if(passController.text.length < 6){
         msg = "Password atleast 6 characters";
-        passMatch = false;
+        validPass = false;
       }
       else
         msg = null;
       return msg;
     }
+
     String confirmPassValidator(String value){
       String msg = "";
       if(value.isEmpty){
         msg = "Confirm Password can\'t be empty";
-        passMatch = false;
+        validPass = false;
       }
       if(passController.text != confirmPassController.text){
         msg = "Password not match";
-        passMatch = false;
+        validPass = false;
       }
       if(passController.text == confirmPassController.text && value.isNotEmpty){
         msg = null;
-        passMatch = true;
+        validPass = true;
       }
       return msg;
+    }
+
+    Widget showCircularProgress() {
+      if (isLoading) {
+        return Center(child: CircularProgressIndicator());
+      }
+      return Container(
+        height: 0.0,
+        width: 0.0,
+      );
     }
 
     Widget _registerTitle(){
@@ -160,7 +203,7 @@ class _RegisterPageState extends State<RegisterPage> {
     Widget _showForm(){
       return new Container(
           child: new Form(
-            key: _formKeyRegister,
+            key: formKeyRegister,
             child: new ListView(
               shrinkWrap: true,
               children: <Widget>[
@@ -197,7 +240,8 @@ class _RegisterPageState extends State<RegisterPage> {
           resizeToAvoidBottomPadding: false,
           body: Stack(
             children: <Widget>[
-              _showForm()
+              _showForm(),
+              showCircularProgress()
             ],
           ),
         ),

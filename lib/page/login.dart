@@ -2,29 +2,40 @@ import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:thesis_app/page/login_selection.dart';
 import 'package:thesis_app/page/register.dart';
-
+import 'package:thesis_app/widget/toast_msg.dart';
 import 'home.dart';
 
 class LoginPage extends StatefulWidget {
+  LoginPage({Key key}) : super(key: key);
+  
   @override
-  _LoginPageState createState() => _LoginPageState();
+  LoginPageState createState() => LoginPageState();
 }
 
-String _email,_password;
+TextEditingController emailController =  TextEditingController();
+TextEditingController passController =  TextEditingController();
+bool validEmail = false;
+bool validPass = false;
+final FirebaseAuth auth = FirebaseAuth.instance;
+bool isLoading = false;
+FlutterToast flutterToast;
 
-class _LoginPageState extends State<LoginPage> {
+class LoginPageState extends State<LoginPage> {
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    flutterToast = FlutterToast(context);
 
+  }
+
+  @override
   Widget build(BuildContext context) {
-
-    final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-    TextEditingController emailController = new TextEditingController();
-    TextEditingController passController = new TextEditingController();
-    bool validEmail = false;
-    bool validPass = false;
-    final FirebaseAuth _auth = FirebaseAuth.instance;
-
 
     String emailValidator(String value){
       String msg ="";
@@ -42,6 +53,7 @@ class _LoginPageState extends State<LoginPage> {
       }
       return msg;
     }
+
     String passValidator(String value){
       String msg = "";
       if(passController.text.length < 6){
@@ -56,9 +68,9 @@ class _LoginPageState extends State<LoginPage> {
       return msg;
     }
 
-    Widget _loginTitle(){
+    Widget loginTitle(){
       return Padding(
-        padding: EdgeInsets.only(bottom: 20, left: 30, right: 30, top: 100),
+        padding: EdgeInsets.only(bottom: 20, left: 30, right: 30, top: 50),
         child: Container(
             width: double.infinity,
             child: Text('Login', style: TextStyle(fontSize: 36), textAlign: TextAlign.left,)
@@ -66,7 +78,7 @@ class _LoginPageState extends State<LoginPage> {
       );
     }
 
-    Widget _formEmailInput(){
+    Widget formEmailInput(){
       return Padding(
         padding: EdgeInsets.only(left: 30,right: 30),
         child: TextFormField(
@@ -82,7 +94,7 @@ class _LoginPageState extends State<LoginPage> {
       );
     }
 
-    Widget _formPasswordInput(){
+    Widget formPasswordInput(){
       return Padding(
         padding: EdgeInsets.only(left: 30,right: 30),
         child: TextFormField(
@@ -98,7 +110,7 @@ class _LoginPageState extends State<LoginPage> {
       );
     }
 
-    Widget _forgotPassword(){
+    Widget forgotPassword(){
       return Padding(
         padding: EdgeInsets.only(top: 10, bottom: 30, left: 30),
         child: Container(
@@ -108,24 +120,47 @@ class _LoginPageState extends State<LoginPage> {
       );
     }
 
-    Widget _loginButton(){
+    void loginValidate() async{
+      setState(() {
+        isLoading = true;
+      });
+      if (formKey.currentState.validate()) {
+        if(validEmail == true && validPass == true){
+          final user = await auth
+              .signInWithEmailAndPassword(email: emailController.text, password: passController.text,)
+              .catchError((e){
+            setState(() {
+              isLoading = false;
+            });
+            ToastMsg(msg: e.code.toString(), flutterToast: flutterToast).showToast();
+          })
+              .whenComplete((){
+            setState(() {
+              isLoading = false;
+            });
+          });
+          if(user!= null){
+            emailController.clear();
+            passController.clear();
+            Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => HomePage()));
+          }
+
+        }
+      }
+      else{
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+
+    Widget loginButton(){
       return Container(
         alignment: Alignment.centerRight,
         child: Material(
           color: Colors.blueAccent,
           child: InkWell(
-              onTap: (){
-                if (_formKey.currentState.validate()) {
-                    if(validEmail == true && validPass == true){
-                      _auth.signInWithEmailAndPassword(
-                        email: emailController.text,
-                        password: passController.text,
-                      ).whenComplete((){
-                        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => HomePage()));
-                      });
-                    }
-                }
-              },
+              onTap: loginValidate,
               child: Container(
                 padding: EdgeInsets.only(top: 20, left: 50, right: 50, bottom: 20),
                 child: Text('Let\'s Go!', style: TextStyle(color: Colors.white),),
@@ -135,7 +170,7 @@ class _LoginPageState extends State<LoginPage> {
       );
     }
 
-    Widget _registerGuide(){
+    Widget registerGuide(){
       return Container(
         width: double.infinity,
         padding: EdgeInsets.only(top: 60, left: 50, right: 50, bottom: 20),
@@ -143,7 +178,7 @@ class _LoginPageState extends State<LoginPage> {
       );
     }
 
-    Widget _registerButton(){
+    Widget registerButton(){
       return Container(
         alignment: Alignment.center,
         child: Material(
@@ -161,20 +196,30 @@ class _LoginPageState extends State<LoginPage> {
       );
     }
 
-    Widget _showForm(){
-      return new Container(
-          child: new Form(
-            key: _formKey,
-            child: new ListView(
+    Widget showCircularProgress() {
+      if (isLoading) {
+        return Center(child: CircularProgressIndicator());
+      }
+      return Container(
+        height: 0.0,
+        width: 0.0,
+      );
+    }
+
+    Widget showForm(){
+      return Container(
+          child: Form(
+            key: formKey,
+            child: ListView(
               shrinkWrap: true,
               children: <Widget>[
-                _loginTitle(),
-                _formEmailInput(),
-                _formPasswordInput(),
-                _forgotPassword(),
-                _loginButton(),
-                _registerGuide(),
-                _registerButton(),
+                loginTitle(),
+                formEmailInput(),
+                formPasswordInput(),
+                forgotPassword(),
+                loginButton(),
+                registerGuide(),
+                registerButton(),
               ],
             ),
           ));
@@ -184,10 +229,24 @@ class _LoginPageState extends State<LoginPage> {
       debugShowCheckedModeBanner: false,
       home: SafeArea(
         child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.white,
+            elevation: 0,
+            leading: new IconButton(
+              icon: new Icon(Icons.arrow_back, color: Colors.black,),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginSelectionPage()),
+                );
+              },
+            ),
+          ),
           resizeToAvoidBottomPadding: false,
           body: Stack(
             children: <Widget>[
-              _showForm(),
+              showForm(),
+              showCircularProgress()
             ],
           ),
         ),

@@ -1,6 +1,5 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:thesis_app/widget//chip.dart';
 import 'package:thesis_app/widget//event_item.dart';
 import 'package:thesis_app/widget/botnavbar.dart';
 
@@ -16,13 +15,16 @@ final dbRef = FirebaseDatabase.instance.reference().child("Events");
 List list=new List();
 
 class _HomePageState extends State<HomePage> {
+  // ignore: must_call_super
   void initState(){
     dbRef.once().then((DataSnapshot snapshot){
       list.clear();
       Map<dynamic, dynamic> values = snapshot.value;
       values.forEach((key,values) {
         print(values);
-        list.add(values);
+        setState(() {
+          list.add(values);
+        });
       });
     });
   }

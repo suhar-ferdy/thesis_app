@@ -57,7 +57,7 @@ class _InstantLoginPageState extends State<LoginSelectionPage> {
                     builder: (context) => SignInButton(
                       Buttons.Email,
                       onPressed: () {
-                        Navigator.pushReplacement(context,
+                        Navigator.push(context,
                             MaterialPageRoute(
                                 builder: (context) => LoginPage()));
                       },

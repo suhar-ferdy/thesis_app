@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:thesis_app/page/serch_result.dart';
 import 'package:thesis_app/widget/botnavbar.dart';
 
 
@@ -11,9 +12,9 @@ class DiscoverPage extends StatefulWidget {
 }
 
 String _selectedCategory = "Any";
-String _selectedDistance = "Limitless";
 List category = ["Any","Culinary","Animal","Sports","Education","Music","Dance","Seminar","Tech", "Religion"];
-List distance = ['1km','2km','3km'];
+TextEditingController distanceController = TextEditingController();
+
 class _DiscoverPageState extends State<DiscoverPage> {
   @override
   Widget build(BuildContext context) {
@@ -83,6 +84,8 @@ class _DiscoverPageState extends State<DiscoverPage> {
                         Expanded(
                             flex : 2,
                             child: TextField(
+                              autofocus: false,
+                              controller: distanceController,
                               maxLength: 2,
                               decoration: InputDecoration(
                                 hintText: "ex. 12",
@@ -105,7 +108,20 @@ class _DiscoverPageState extends State<DiscoverPage> {
                         width: double.infinity,
                         child: RaisedButton(
                           padding: EdgeInsets.only(left: 30,right: 30,top: 20, bottom: 20),
-                          onPressed: (){},
+                          onPressed: (){
+                            int d;
+                            if(distanceController.text == "")
+                              d = 0;
+                            if(distanceController.text != "")
+                              d = int.parse(distanceController.text);
+
+                            Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) =>
+                                  SearchResultPage(
+                                    distance: d,
+                                  )
+                            ));
+                          },
                           color: Colors.redAccent,
                           child: Text('Find things to do..', style: TextStyle(color: Colors.white),),
                         ),
