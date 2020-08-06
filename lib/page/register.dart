@@ -19,7 +19,7 @@ TextEditingController confirmPassController = new TextEditingController();
 bool validEmail = false;
 bool validPass = false;
 bool isLoading = false;
-FlutterToast flutterToast;
+FToast flutterToast;
 final FirebaseAuth _auth = FirebaseAuth.instance;
 
 class _RegisterPageState extends State<RegisterPage> {
@@ -27,7 +27,7 @@ class _RegisterPageState extends State<RegisterPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    flutterToast = FlutterToast(context);
+    flutterToast = FToast(context);
   }
   @override
   Widget build(BuildContext context) {
@@ -230,7 +230,7 @@ class _RegisterPageState extends State<RegisterPage> {
             leading: new IconButton(
               icon: new Icon(Icons.arrow_back, color: Colors.black,),
               onPressed: () {
-                Navigator.push(
+                Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => LoginPage()),
                 );

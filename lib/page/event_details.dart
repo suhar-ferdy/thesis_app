@@ -1,19 +1,67 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class EventDetailsPage extends StatefulWidget {
-
+  final event;
+  EventDetailsPage({this.event});
   @override
   _EventDetailsPageState createState() => _EventDetailsPageState();
 }
 
 class _EventDetailsPageState extends State<EventDetailsPage> {
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    var initializationSettingsAndroid = AndroidInitializationSettings('@mipmap/ic_launcher');
+    var initializationSettingsIOS = IOSInitializationSettings();
+    var initializationSettings = InitializationSettings(
+        initializationSettingsAndroid, initializationSettingsIOS);
+    flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onSelectNotification: selectNotification);
+  }
+
+  Future selectNotification(String payload) async {
+    if (payload != null) {
+      debugPrint('notification payload: ' + payload);
+    }
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => AlertDialog(title: Text('Aye'),content: Text('Aye Content'),)),
+    );
+  }
+
+  Duration timeDifference(){
+    var dateEvent = DateTime(2020,8,3,17,50);
+    var date = DateTime.now();
+    var val  = dateEvent.difference(date);
+    return val;
+  }
+
+  setNotifications() async{
+    var duration = timeDifference();
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+        'your channel id', 'your channel name', 'your channel description',
+        importance: Importance.Max, priority: Priority.High, ticker: 'ticker');
+    var iOSPlatformChannelSpecifics = IOSNotificationDetails();
+    var platformChannelSpecifics = NotificationDetails(
+        androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+//    await flutterLocalNotificationsPlugin.show(
+//        0, 'plain title', 'plain body', platformChannelSpecifics,
+//        payload: 'item x');
+    await flutterLocalNotificationsPlugin.schedule(
+        0,
+        'scheduled title',
+        'scheduled body',
+        DateTime.now().add(duration),
+        platformChannelSpecifics);
+  }
+
   @override
   Widget build(BuildContext context) {
-    String description =
-    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.';
-    return MaterialApp(
+     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: SafeArea(
         child: Scaffold(
@@ -47,7 +95,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                           Icon(Icons.date_range),
                           Padding(
                               padding: EdgeInsets.only(left: 5),
-                              child: Text('Date',style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold, ),)
+                              child: Text(widget.event['dates'],style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold, ),)
                           ),
                         ],
                       )
@@ -56,7 +104,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                       margin: EdgeInsets.only(top: 20,left: 10,right: 10),
                       alignment: Alignment.centerLeft,
                       child: Container(
-                        child: Text('Event Name',
+                        child: Text(widget.event['eventName'],
                           style: TextStyle(
                               fontSize: 30,
                               fontWeight: FontWeight.bold,
@@ -70,7 +118,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                       margin: EdgeInsets.only(top: 10,left: 10,right: 10),
                       alignment: Alignment.centerLeft,
                       child: Container(
-                        child: Text('Address Location',
+                        child: Text(widget.event['address'],
                           style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
@@ -84,8 +132,8 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                       alignment: Alignment.centerLeft,
                       child: FlatButton.icon(
                           onPressed: (){},
-                          icon: Icon(Icons.local_atm),
-                          label: Text('Set price')
+                          icon: Icon(Icons.alarm),
+                          label: Text(widget.event['times'])
                       ),
                     ),
                     Container(
@@ -94,12 +142,10 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                         spacing: 5,
                         direction: Axis.horizontal,
                         children: <Widget>[
-
                           Text('#Tech'),
                           Text('#Religion'),
                           Text('#Fashion'),
                           Text('#Other'),
-
                         ],
                       ),
                     ),
@@ -107,7 +153,7 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                       margin: EdgeInsets.only(top: 20,left: 10, right: 10),
                       alignment: Alignment.centerLeft,
                       child: Container(
-                        child: Text(description,
+                        child: Text(widget.event['description'],
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -127,7 +173,9 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
                     width: double.infinity,
                     child: RaisedButton(
                       padding: EdgeInsets.only(left: 30,right: 30,top: 20, bottom: 20),
-                      onPressed: (){},
+                      onPressed: (){
+                        setNotifications();
+                      },
                       color: Colors.redAccent,
                       child: Text('Add to favourites..', style: TextStyle(color: Colors.white),),
                     ),

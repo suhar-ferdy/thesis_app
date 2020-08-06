@@ -2,23 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:thesis_app/page/event_details.dart';
 
 class EventItem extends StatelessWidget {
-  String eventName;
-  String address;
-  double lng;
-  double lat;
-  String date;
-  String time;
-  String category;
-  EventItem({this.eventName});
+  final event;
+  EventItem({this.event});
   @override
   Widget build(BuildContext context) {
-    String name = eventName;
     return Container(
       padding: EdgeInsets.only(top: 30, bottom: 10,left: 20,right: 20),
       child: Material(
         child: InkWell(
             onTap: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context) => EventDetailsPage()));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => EventDetailsPage(event: event,)));
             },
             child: Row(
               children: <Widget>[
@@ -45,7 +38,7 @@ class EventItem extends StatelessWidget {
                         Container(
                           padding: EdgeInsets.only(left: 10,bottom: 15,top: 5),
                           width: double.infinity,
-                          child: Text(eventName == null ? '' : eventName,style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold),),
+                          child: Text(event['eventName'] == null ? '' : event['eventName'],style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold),),
                         ),
                         Container(
                           padding: EdgeInsets.only(left: 10),

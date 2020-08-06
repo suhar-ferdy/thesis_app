@@ -6,6 +6,7 @@ import 'package:thesis_app/firebase/crud.dart';
 
 
 class PostEventPage extends StatefulWidget {
+  PostEventPage({Key key}) : super(key: key);
   _PostEventPageState createState() => _PostEventPageState();
 }
 
@@ -17,8 +18,8 @@ TextEditingController eventNameController = new TextEditingController();
 TextEditingController descController = new TextEditingController();
 
 class _PostEventPageState extends State<PostEventPage> {
-  Widget build(BuildContext context) {
 
+  Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home : SafeArea(
@@ -137,7 +138,7 @@ class _PostEventPageState extends State<PostEventPage> {
                           "dates" : dates,
                           "times" : times,
                         };
-                        CRUD().create(data);
+                        CRUD().readDuplicateAndCreate(data,'Events','eventName');
                       },
                       color: Colors.redAccent,
                       child: Text('Post my event..', style: TextStyle(color: Colors.white),),

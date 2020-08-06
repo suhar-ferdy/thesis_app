@@ -8,7 +8,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:thesis_app/widget/toast_msg.dart';
 
 class SearchResultPage extends StatefulWidget {
-  int distance;
+  final int distance;
   SearchResultPage({Key key, this.distance}) : super(key: key);
 
   @override
@@ -18,14 +18,13 @@ class SearchResultPage extends StatefulWidget {
 List list = new List();
 final dbRef = FirebaseDatabase.instance.reference().child("Events");
 int count;
-
-FlutterToast flutterToast;
+FToast flutterToast;
 
 class _SearchResultPageState extends State<SearchResultPage> {
 
   void initState() {
     super.initState();
-    flutterToast = FlutterToast(context);
+    flutterToast = FToast(context);
     list.clear();
     dbRef.once().then((DataSnapshot snapshot) async {
       Position position = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
@@ -81,7 +80,7 @@ class _SearchResultPageState extends State<SearchResultPage> {
           body: ListView.builder(
             itemCount: list.length,
             itemBuilder: (BuildContext ctx, int index){
-              return EventItem(eventName: list[index]["eventName"],);
+              return EventItem(event: list[index],);
             },
           ),
         ),

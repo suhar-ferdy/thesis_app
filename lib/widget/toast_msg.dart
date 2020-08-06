@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class ToastMsg {
-  FlutterToast flutterToast;
+  FToast flutterToast;
   String msg;
   ToastMsg({this.flutterToast, this.msg});
 

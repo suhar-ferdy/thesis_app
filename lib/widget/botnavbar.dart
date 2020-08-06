@@ -6,7 +6,7 @@ import 'package:thesis_app/page/notifications.dart';
 
 
 class BotNavBar extends StatelessWidget {
-  var currIndex;
+  final currIndex;
   BotNavBar({this.currIndex});
   @override
   Widget build(BuildContext context) {

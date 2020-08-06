@@ -21,7 +21,7 @@ bool validEmail = false;
 bool validPass = false;
 final FirebaseAuth auth = FirebaseAuth.instance;
 bool isLoading = false;
-FlutterToast flutterToast;
+FToast flutterToast;
 
 class LoginPageState extends State<LoginPage> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
@@ -30,7 +30,7 @@ class LoginPageState extends State<LoginPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    flutterToast = FlutterToast(context);
+    flutterToast = FToast(context);
 
   }
 
@@ -185,7 +185,7 @@ class LoginPageState extends State<LoginPage> {
           color: Colors.redAccent,
           child: InkWell(
               onTap: (){
-                Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterPage()));
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => RegisterPage()));
               },
               child: Container(
                 padding: EdgeInsets.only(top: 20, left: 50, right: 50, bottom: 20),

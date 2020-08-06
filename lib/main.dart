@@ -13,7 +13,7 @@ void main(){
       future: FirebaseAuth.instance.currentUser(),
       builder: (BuildContext context, AsyncSnapshot<FirebaseUser> snapshot){
         if (snapshot.hasData){
-          FirebaseUser user = snapshot.data; // this is your user instance
+//          FirebaseUser user = snapshot.data; // this is your user instance
           /// is because there is user already logged
           return HomePage();
         }
