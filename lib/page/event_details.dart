@@ -29,7 +29,12 @@ class _EventDetailsPageState extends State<EventDetailsPage> {
     }
     await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => AlertDialog(title: Text('Aye'),content: Text('Aye Content'),)),
+      MaterialPageRoute(builder: (context) =>
+          AlertDialog(
+            title: Text('Aye'),
+            content: Text('Aye Content'),
+          )
+      ),
     );
   }
 

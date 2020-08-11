@@ -1,5 +1,6 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:thesis_app/widget//event_item.dart';
 import 'package:thesis_app/widget/botnavbar.dart';
 
@@ -16,15 +17,40 @@ List list=new List();
 class _HomePageState extends State<HomePage> {
   // ignore: must_call_super
   void initState(){
+    loadEvents();
+  }
+
+  void loadEvents(){
     dbRef.once().then((DataSnapshot snapshot){
       list.clear();
       Map<dynamic, dynamic> values = snapshot.value;
       values.forEach((key,values) {
-        setState(() {
-          list.add(values);
-        });
+        if(!timeDifference(values['day'], values['month'], values['year'], values['hour'], values['minute']).isNegative){
+          setState(() {
+            list.add(values);
+          });
+        }
       });
+    }).whenComplete((){
+      if(list.isEmpty){
+        Fluttertoast.showToast(
+            msg: "No Events",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.grey,
+            textColor: Colors.white,
+            fontSize: 16.0
+        );
+      }
     });
+  }
+
+  Duration timeDifference(int day, int month, int year, int hour, int minute){
+    var dateEvent = DateTime(year,month,day,hour,minute);
+    var date = DateTime.now();
+    var val  = dateEvent.difference(date);
+    return val;
   }
 
   @override

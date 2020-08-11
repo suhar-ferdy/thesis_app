@@ -36,19 +36,19 @@ class EventItem extends StatelessWidget {
                     child: Column(
                       children: <Widget>[
                         Container(
-                          padding: EdgeInsets.only(left: 10,bottom: 15,top: 5),
+                          padding: EdgeInsets.only(left: 10,bottom: 10,top: 5),
                           width: double.infinity,
-                          child: Text(event['eventName'] == null ? '' : event['eventName'],style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold),),
+                          child: Text(event['eventName'] == null ? '' : event['eventName'],style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold),),
                         ),
                         Container(
                           padding: EdgeInsets.only(left: 10),
                           width: double.infinity,
-                          child: Text('Event Organizer',style: TextStyle(fontSize: 12),),
+                          child: Text(event['address'] == null ? '' : event['address'],style: TextStyle(fontSize: 14, color: Colors.blueAccent),),
                         ),
                         Container(
                           padding: EdgeInsets.only(left: 10),
                           width: double.infinity,
-                          child: Text('Distance',style: TextStyle(fontSize: 12),),
+                          child: Text(event['category'] == null ? '' : event['category'],style: TextStyle(fontSize: 12),),
                         )
                       ],
                     ),

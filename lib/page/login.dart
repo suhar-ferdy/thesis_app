@@ -198,7 +198,12 @@ class LoginPageState extends State<LoginPage> {
 
     Widget showCircularProgress() {
       if (isLoading) {
-        return Center(child: CircularProgressIndicator());
+        return Container(
+          width: double.infinity,
+          height: double.infinity,
+          color: Colors.white10,
+          child: Center(child: CircularProgressIndicator()),
+        );
       }
       return Container(
         height: 0.0,

@@ -6,7 +6,11 @@ class CRUD {
 
   void create(var data, String tableName, String dataProperty) async{
 //    FirebaseUser user = await FirebaseAuth.instance.currentUser();
-    FirebaseDatabase.instance.reference().child(tableName).child(data[dataProperty]).set(data);
+    FirebaseDatabase.instance
+        .reference()
+        .child(tableName)
+        .child(data[dataProperty])
+        .set(data);
   }
   void readDuplicateAndCreate(var data, String tableName, String dataProperty) async{
     var val;
@@ -17,6 +21,16 @@ class CRUD {
       if(val == null){
         print('safe');
         create(data, tableName, dataProperty);
+        Fluttertoast.showToast(
+            msg: "Event registered",
+            toastLength: Toast.LENGTH_LONG,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.grey,
+            textColor: Colors.white,
+            fontSize: 16.0
+        );
+
       }
       else{
         Fluttertoast.showToast(
