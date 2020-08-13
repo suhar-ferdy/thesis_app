@@ -94,6 +94,7 @@ class _PostEventPageState extends State<PostEventPage> {
       child: Text("Continue"),
       onPressed:  () {
         registerEvent();
+        Navigator.pop(context);
       },
     );
 
@@ -114,6 +115,7 @@ class _PostEventPageState extends State<PostEventPage> {
       },
     );
   }
+
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,

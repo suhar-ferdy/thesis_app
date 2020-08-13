@@ -25,6 +25,7 @@ var uid;
 StorageReference ref = FirebaseStorage.instance.ref();
 class _AccountPageState extends State<AccountPage> {
 
+  // ignore: must_call_super
   void initState(){
     if(_uploadedFileURL == null && _image == null)
         downloadFile();
