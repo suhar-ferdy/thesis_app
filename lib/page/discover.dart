@@ -2,6 +2,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:thesis_app/page/event_details.dart';
 import 'package:thesis_app/page/serch_result.dart';
 import 'package:thesis_app/widget/botnavbar.dart';
 
@@ -14,8 +15,8 @@ class DiscoverPage extends StatefulWidget {
   _DiscoverPageState createState() => _DiscoverPageState();
 }
 
-String _selectedCategory = "Any";
-List category = ["Any","Culinary","Animal","Sports","Education","Music","Dance","Seminar","Tech", "Religion"];
+String _selectedCategory = "\#Any";
+List category = ["\#Any","\#Culinary","\#Animal","\#Sports","\#Education","\#Music","\#Dance","\#Seminar","\#Tech", "\#Religion"];
 TextEditingController distanceController = TextEditingController();
 
 final dbRef = FirebaseDatabase.instance.reference().child("Events");
@@ -81,11 +82,11 @@ class _DiscoverPageState extends State<DiscoverPage> {
                     padding: EdgeInsets.only(left: 20, right: 20,top: 50),
                     child: TypeAheadField(
                       textFieldConfiguration: TextFieldConfiguration(
-                          autofocus: true,
+                          autofocus: false,
                           decoration: InputDecoration(
                               hintText: 'Search for...',
                               prefixIcon: Icon(Icons.search),
-                              border: OutlineInputBorder()
+                              border: OutlineInputBorder(),
                           )
                       ),
                       suggestionsCallback: (pattern) async {
@@ -99,7 +100,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                         );
                       },
                       onSuggestionSelected: (suggestion) {
-
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => EventDetailsPage(event: suggestion,)));
                       },
                     ),
                 ),
@@ -176,6 +177,8 @@ class _DiscoverPageState extends State<DiscoverPage> {
                               builder: (context) =>
                                   SearchResultPage(
                                     distance: d,
+                                    data: list,
+                                    category: _selectedCategory,
                                   )
                             ));
                           },

@@ -22,16 +22,21 @@ String _uploadedFileURL;
 final picker = ImagePicker();
 FirebaseUser user;
 var uid;
+var userName;
 StorageReference ref = FirebaseStorage.instance.ref();
 class _AccountPageState extends State<AccountPage> {
 
   // ignore: must_call_super
   void initState(){
+    loadUsername();
     if(_uploadedFileURL == null && _image == null)
         downloadFile();
 
   }
-
+  void loadUsername() async{
+    FirebaseUser firebaseUser = await FirebaseAuth.instance.currentUser();
+    userName = firebaseUser.email;
+  }
   Future getImage() async {
     final pickedFile = await picker.getImage(source: ImageSource.camera);
     setState(() {
@@ -102,7 +107,7 @@ class _AccountPageState extends State<AccountPage> {
                         ),
                         Padding(
                           padding: EdgeInsets.only(top: 10),
-                          child: Text("John Doe", textScaleFactor: 1.5, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 26),),
+                          child: Text(userName != null ? userName : '', textScaleFactor: 1.5, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),),
                         )
                       ],
                     )

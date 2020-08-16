@@ -9,7 +9,9 @@ import 'package:thesis_app/widget/toast_msg.dart';
 
 class SearchResultPage extends StatefulWidget {
   final int distance;
-  SearchResultPage({Key key, this.distance}) : super(key: key);
+  final String category;
+  final List data;
+  SearchResultPage({Key key, this.distance, this.data, this.category}) : super(key: key);
 
   @override
   _SearchResultPageState createState() => _SearchResultPageState();
@@ -26,31 +28,42 @@ class _SearchResultPageState extends State<SearchResultPage> {
     super.initState();
     flutterToast = FToast(context);
     list.clear();
-    dbRef.once().then((DataSnapshot snapshot) async {
+    loadResult();
+  }
+  void loadResult() async{
+    if(widget.data != null){
       Position position = await Geolocator().getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-      Map<dynamic, dynamic> values = snapshot.value;
-      values.forEach((key,values) {
-        double d = getDistanceFromLatLonInKm(position.latitude, position.longitude, values["lat"], values["lng"]);
-        print(d);
-        print(position.latitude);
-        print(position.longitude);
-        if(widget.distance == 0){
-          setState(() {
-            list.add(values);
-          });
-        }
-        if(d < widget.distance){
+      widget.data.forEach((item){
+        double d = getDistanceFromLatLonInKm(position.latitude, position.longitude, item["lat"], item["lng"]);
+        if(widget.category == '\#Any'){
+          if(widget.distance == 0){
             setState(() {
-              list.add(values);
+              list.add(item);
             });
           }
+          if(d < widget.distance){
+            setState(() {
+              list.add(item);
+            });
+          }
+        }
+        else{
+          if(widget.distance == 0 && widget.category == item['category']){
+            setState(() {
+              list.add(item);
+            });
+          }
+          if(d < widget.distance && widget.category == item['category']){
+            setState(() {
+              list.add(item);
+            });
+          }
+        }
       });
-    }).whenComplete((){
-      if(list.length == 0){
-        ToastMsg(msg: "No search results", flutterToast:  flutterToast).showToast();
-      }
-
-    });
+    }
+    else{
+      ToastMsg(msg: "No search results", flutterToast:  flutterToast).showToast();
+    }
   }
 
   double getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2) {
