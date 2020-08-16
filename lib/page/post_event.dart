@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:intl/intl.dart';
@@ -63,8 +64,11 @@ class _PostEventPageState extends State<PostEventPage> {
         },
         currentTime: DateTime.now(), locale: LocaleType.id);
   }
-  void registerEvent(){
+  void registerEvent() async{
+    FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    var uid = user.uid;
     var data = {
+      "user" : uid,
       "eventName" : eventNameController.text,
       "description" : descController.text,
       "address" : _placeData.toString(),

@@ -1,4 +1,7 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:thesis_app/page/serch_result.dart';
 import 'package:thesis_app/widget/botnavbar.dart';
 
@@ -15,7 +18,54 @@ String _selectedCategory = "Any";
 List category = ["Any","Culinary","Animal","Sports","Education","Music","Dance","Seminar","Tech", "Religion"];
 TextEditingController distanceController = TextEditingController();
 
+final dbRef = FirebaseDatabase.instance.reference().child("Events");
+List list=new List();
+
 class _DiscoverPageState extends State<DiscoverPage> {
+
+  void initState(){
+    loadEvents();
+  }
+
+  Duration timeDifference(int day, int month, int year, int hour, int minute){
+    var dateEvent = DateTime(year,month,day,hour,minute);
+    var date = DateTime.now();
+    var val  = dateEvent.difference(date);
+    return val;
+  }
+
+  static List getSuggestions(String query) {
+    List matches = List();
+    matches.addAll(list);
+
+    matches.retainWhere((s) => s['eventName'].toLowerCase().contains(query.toLowerCase()) || s['address'].toLowerCase().contains(query.toLowerCase()));
+    return matches;
+  }
+  void loadEvents(){
+    dbRef.once().then((DataSnapshot snapshot){
+      list.clear();
+      Map<dynamic, dynamic> values = snapshot.value;
+      values.forEach((key,values) {
+        if(!timeDifference(values['day'], values['month'], values['year'], values['hour'], values['minute']).isNegative){
+          setState(() {
+            list.add(values);
+          });
+        }
+      });
+    }).whenComplete((){
+      if(list.isEmpty){
+        Fluttertoast.showToast(
+            msg: "No Events",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.BOTTOM,
+            timeInSecForIosWeb: 1,
+            backgroundColor: Colors.grey,
+            textColor: Colors.white,
+            fontSize: 16.0
+        );
+      }
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -29,24 +79,31 @@ class _DiscoverPageState extends State<DiscoverPage> {
               children: <Widget>[
                 Container(
                     padding: EdgeInsets.only(left: 20, right: 20,top: 50),
-                    child: TextField(
-                      autocorrect: true,
-                      decoration: InputDecoration(
-                        hintText: 'Search for...',
-                        prefixIcon: Icon(Icons.search),
-                        hintStyle: TextStyle(color: Colors.grey),
-                        filled: true,
-                        fillColor: Colors.white12,
-//                        enabledBorder: OutlineInputBorder(
-//                          borderRadius: BorderRadius.all(Radius.circular(12.0)),
-//                          borderSide: BorderSide(color: Colors.green, width: 2),
-//                        ),
-//                        focusedBorder: OutlineInputBorder(
-//                          borderRadius: BorderRadius.all(Radius.circular(10.0)),
-//                          borderSide: BorderSide(color: Colors.green, width: 2),
-//                        ),
-                      ),)
+                    child: TypeAheadField(
+                      textFieldConfiguration: TextFieldConfiguration(
+                          autofocus: true,
+                          decoration: InputDecoration(
+                              hintText: 'Search for...',
+                              prefixIcon: Icon(Icons.search),
+                              border: OutlineInputBorder()
+                          )
+                      ),
+                      suggestionsCallback: (pattern) async {
+                        return getSuggestions(pattern);
+                      },
+                      itemBuilder: (context, suggestion) {
+                        return ListTile(
+                          leading: Icon(Icons.event),
+                          title: Text(suggestion['eventName']),
+                          subtitle: Text(suggestion['address']),
+                        );
+                      },
+                      onSuggestionSelected: (suggestion) {
+
+                      },
+                    ),
                 ),
+
                 Container(
                   padding: EdgeInsets.only(top: 25,left: 20,right: 20),
                   width: double.infinity,
